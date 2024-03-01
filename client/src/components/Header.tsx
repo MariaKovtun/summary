@@ -7,7 +7,7 @@ const HeaderControlPics = () => {
     const {order} = useContext(CartContext);
     
     const [searchFieldVisible,setSearchFieldVisible] = useState<boolean>(false);
-
+   
     let formClassName = `header-controls-search-form form-inline ${searchFieldVisible ? "" : "invisible"}`;
 
     return (

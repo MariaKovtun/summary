@@ -27,6 +27,7 @@ const CatalogItemCardFull = () => {
 
     const [item,setItem] = useState<CatalogItemCardFullProps>();
     const [quantity, setQuantity] = useState<number>(1);
+    const [size, setSize] = useState<string>();
 
     const {order,setOrder} = useContext(CartContext);
     
@@ -39,7 +40,7 @@ const CatalogItemCardFull = () => {
     useEffect(() => fetchItem(id),[id]);
 
     const addToCart = (item: CatalogItemCardFullProps) => {
-        setOrder(order.concat([{id: item.id,title: item.title, size: item.size, price: item.price, quantity: quantity}]));
+        setOrder(order.concat([{id: item.id,title: item.title, size: size, price: item.price, quantity: quantity}]));
     }
 
    return (
@@ -82,7 +83,10 @@ const CatalogItemCardFull = () => {
                     <div className="text-center">
                         <p>Размеры в наличии: 
                             {item.sizes.filter((elem) => !!elem.available).map((elem, index) => 
-                            <span key={index} className="catalog-item-size selected">{elem.size}</span> 
+                            <span 
+                            key={index} 
+                            className={`catalog-item-size ${(elem.size == size)? "selected": ""}`}
+                            onClick={() => setSize(elem.size)}>{elem.size}</span> 
                             )}  
                         </p>
                         <p>Количество: 
@@ -93,7 +97,7 @@ const CatalogItemCardFull = () => {
                             </span>
                         </p>
                     </div>
-                    <button className="btn btn-danger btn-block btn-lg" onClick={() => addToCart(item)}>В корзину</button>
+                    <button className="btn btn-danger btn-block btn-lg" disabled={(typeof size === "undefined") || item.sizes.filter((elem) => elem.available).length == 0} onClick={() => addToCart(item)}>В корзину</button>
                 </div>
            </Row>
         </section> : null
