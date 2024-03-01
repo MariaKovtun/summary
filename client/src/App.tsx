@@ -13,7 +13,11 @@ import { useState } from 'react'
 import {CartContext, CartContextElementType} from './contexts/CartContext';
 
 function App() {
-  const [order,setOrder] = useState<CartContextElementType[]>([]);
+  const [order,setOrder] = useState<CartContextElementType[]>([{id: 20,
+    title: "Hello",
+    size: "18 US",
+    price: 34,
+    quantity: 2}]);
 
   return (
     <CartContext.Provider value={{order,setOrder}}>

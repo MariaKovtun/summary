@@ -16,7 +16,7 @@ const HeaderControlPics = () => {
             <div data-id="search-expander" className="header-controls-pic header-controls-search" 
             onClick={() => setSearchFieldVisible(!searchFieldVisible)}></div>
             <a className="header-controls-pic header-controls-cart" href="/cart">
-                <div className="header-controls-cart-full">{order.length}</div>
+                {(order.length > 0) && <div className="header-controls-cart-full">{order.length}</div>}
                 <div className="header-controls-cart-menu"></div>
             </a>
         </div>

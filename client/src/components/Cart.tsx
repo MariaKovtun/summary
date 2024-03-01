@@ -1,10 +1,102 @@
-import { Table } from "react-bootstrap"
-import {CartContext} from '../contexts/CartContext';
-import {useContext} from 'react';
+import { Button, Form, Table, Spinner} from "react-bootstrap"
+import {CartContext, CartContextElementType} from '../contexts/CartContext';
+import {useContext, useState} from 'react';
+import axios from "axios";
+
+
+const OrderForm = () => {
+    const {order, setOrder} = useContext(CartContext);
+
+    const toCartItem = (item: CartContextElementType) => {
+      return {id: item.id,price: item.price, count: item.quantity}
+    }
+    
+    const [address,setAddress] = useState<string>();
+    const [phone,setPhone] = useState<string>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>();
+    const [success, setSuccess] = useState<boolean>();
+
+    const handleSubmit = () => {
+      setIsLoading(true);
+      axios.post('http://localhost:7070/api/order', {
+        "owner": {
+          "phone": phone,
+           "address": address
+        },
+        "items": order.map((item) => toCartItem(item))
+      })
+      .then((response) => {
+        setIsLoading(false);
+        if (response.status == 204) {
+          setSuccess(true);
+          setOrder([]);
+        } else { setSuccess(false);}
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setSuccess(false);
+        setError(error);
+      });
+    }
+
+    const handlePhoneChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const {value} = event.target;
+      setPhone(value);
+    }
+
+    const handleAddressChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const {value} = event.target;
+      setAddress(value);
+    }
+
+    return (
+      success ?
+      <h2>Заказ успешно оформлен</h2> :
+      error ?
+      <h2>Не удалось оформить заказ, переагрузите страницу и попробуйте еще раз</h2> :
+      (order.length > 0) ?
+      <section className="order">
+        <h2 className="text-center">Оформить заказ</h2>
+        <div className="card">
+          <Form className="card-body" onSubmit={(e: React.SyntheticEvent) => {
+             e.preventDefault();
+             handleSubmit();
+            }}>
+              <Form.Group controlId="phone">
+                <Form.Label>Телефон</Form.Label>
+                <Form.Control type="text" placeholder="+7XXXXXXXXX" required={true} onChange={handlePhoneChanged}/>
+              </Form.Group>
+              <Form.Group controlId="address">
+                <Form.Label>Адрес доставки</Form.Label>
+                <Form.Control type="text" placeholder="Например: г. Москва, ул. Б. Якиманка, д. 42" required={true} onChange={handleAddressChanged}/>
+              </Form.Group>
+              <Form.Group controlId="agreement">
+                <Form.Check
+                required={true}
+                type="checkbox"
+                id="agreementCheckbox"
+                label="Согласен с правилами доставки"
+                />
+              </Form.Group>
+              <div className="text-center">
+              {isLoading ? 
+              <Button variant="outline-secondary" disabled>
+                <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/>
+                Оформление...
+              </Button> : 
+               <Button type="submit" variant="outline-secondary">Оформить</Button>}
+              </div>
+          </Form>
+        </div>
+      </section> :
+      <h4>Добавьте товары в корзину для оформления заказа</h4>
+    )
+    
+}
 
 const Cart = () => {
-    const {order,setOrder} = useContext(CartContext);
-    
+    const {order, setOrder} = useContext(CartContext);
     return (
         <>
         <section className="cart">
@@ -44,28 +136,7 @@ const Cart = () => {
                 </tr>
               </tbody>
             </Table>
-          </section>
-          <section className="order">
-            <h2 className="text-center">Оформить заказ</h2>
-            <div className="card">
-              <form className="card-body">
-                <div className="form-group">
-                  <label htmlFor="phone">Телефон</label>
-                  <input className="form-control" id="phone" placeholder="Ваш телефон"></input>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="address">Адрес доставки</label>
-                  <input className="form-control" id="address" placeholder="Адрес доставки"></input>
-                </div>
-                <div className="form-group form-check">
-                  <input type="checkbox" className="form-check-input" id="agreement">
-                  
-                  </input>
-                  <label className="form-check-label" htmlFor="agreement">Согласен с правилами доставки</label>
-                </div>
-                <button type="submit" className="btn btn-outline-secondary">Оформить</button>
-              </form>
-            </div>
+            <OrderForm/>
           </section>
         </>
     )   

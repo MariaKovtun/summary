@@ -305,3 +305,10 @@ h2, .h2 {
   background-color: #727e86;
   border-color: #727e86;
 }
+
+/* корзина */
+.order {
+  width: 500px;
+  margin: auto;
+  text-align: left;
+}
