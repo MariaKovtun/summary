@@ -1,18 +1,23 @@
 import {Row} from 'react-bootstrap';
 import CatalogItemCard from './CatalogItemCard';
-import CatalogItemsProps from './CatalogItemsProps';
+import useData from "../hooks/useData";
+import {Spinner} from "react-bootstrap";
 
-const Bestsellers = (props: CatalogItemsProps) => {
-        //div className="preloader"
+const Bestsellers = () => {
+        const [{data,isLoading,error}] = useData('http://localhost:7070/api/top-sales');
+
         return (
-          !!props?.items ?    
-          <section className="top-sales">
+                <section className="top-sales">
                   <h2 className="text-center">Хиты продаж!</h2>
                   <Row>
-                  {props.items?.map((item) => <CatalogItemCard {...item}></CatalogItemCard>)}
+                  {!!isLoading ? 
+                  <div className="d-flex justify-content-center">
+                  <Spinner animation="border" />
+                  </div> : 
+                  error ? <p>Ошибка загрузки данных</p> :   
+                  data?.map((item) => <CatalogItemCard key={item.id} {...item}></CatalogItemCard>)}
                   </Row>
-          </section> :
-          null      
+                </section>
         )
         
 }

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import {useParams} from 'react-router-dom';
-import {Row, Table} from "react-bootstrap";
+import {Row, Spinner, Table} from "react-bootstrap";
 import {CartContext} from '../contexts/CartContext';
 import {useContext} from 'react';
 
@@ -26,15 +26,25 @@ const CatalogItemCardFull = () => {
     const {id} = useParams();
 
     const [item,setItem] = useState<CatalogItemCardFullProps>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>();
     const [quantity, setQuantity] = useState<number>(1);
     const [size, setSize] = useState<string>();
 
     const {order,setOrder} = useContext(CartContext);
     
     const fetchItem = (id?: string) => {
+        setIsLoading(true);
         axios.get(`http://localhost:7070/api/items/${id}`)
         .then(res => res.data)
-        .then(data => setItem(data));
+        .then(data => {
+            setItem(data);
+            setIsLoading(false);
+        })
+        .catch(error => {
+            setIsLoading(false);
+            setError(error);
+        });
     }
     
     useEffect(() => fetchItem(id),[id]);
@@ -44,7 +54,17 @@ const CatalogItemCardFull = () => {
     }
 
    return (
-       !!item ? 
+       isLoading ? <>
+        <Spinner animation="grow" variant="primary" />
+        <Spinner animation="grow" variant="secondary" />
+        <Spinner animation="grow" variant="success" />
+        <Spinner animation="grow" variant="danger" />
+        <Spinner animation="grow" variant="warning" />
+        <Spinner animation="grow" variant="info" />
+        <Spinner animation="grow" variant="light" />
+        <Spinner animation="grow" variant="dark" />
+       </> :
+       error ? <p>Произошла ошибка при загрузке элемента. Обновите страницу и повторите попытку</p> :
        <section className="catalog-item">
            <h2 className="text-center">{item.title}</h2>
            <Row>
@@ -100,7 +120,7 @@ const CatalogItemCardFull = () => {
                     <button className="btn btn-danger btn-block btn-lg" disabled={(typeof size === "undefined") || item.sizes.filter((elem) => elem.available).length == 0} onClick={() => addToCart(item)}>В корзину</button>
                 </div>
            </Row>
-        </section> : null
+        </section>
    ); 
 }
 
