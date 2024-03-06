@@ -1,8 +1,9 @@
 import {Container, Row, Col, Nav, Spinner, Button} from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import CatalogItemCard from './CatalogItemCard';
 import useData from "../hooks/useData";
+import { SearchContext } from '../contexts/SearchContext';
 
 type CatalogProps = {
     children?: React.ReactNode;
@@ -12,7 +13,10 @@ const Catalog = (props: CatalogProps) => {
     const [categories, setCategories] = useState<{id:number,title:string}[]>();
     const [selectedCategory,setSelectedCategory] = useState<number>();
     const [currentOffset,setCurrentOffset] = useState<number>(0);
-    const [url, setUrl] = useState<string>('http://localhost:7070/api/items');
+    const basicFetchElementsUrl = 'http://localhost:7070/api/items'
+    const [url, setUrl] = useState<string>(basicFetchElementsUrl);
+
+    const {searchStr} = useContext(SearchContext);
 
     const fetchCategories = () => {
         axios.get('http://localhost:7070/api/categories')
@@ -21,7 +25,10 @@ const Catalog = (props: CatalogProps) => {
     }
 
     const fetchElements = (selectedCategory?:number, offset: boolean = false) => {
-        let url = `http://localhost:7070/api/items${!!selectedCategory ? `?categoryId=${selectedCategory}` : ""}${offset ? `${!!selectedCategory ? "&" : "?"}offset=${currentOffset+6}` : ""}`;
+        let url = `${basicFetchElementsUrl}${!!selectedCategory ? `?categoryId=${selectedCategory}` : ""}${offset ? `${!!selectedCategory ? "&" : "?"}offset=${currentOffset+6}` : ""}`;
+        if (!!searchStr) {
+            url = `${url}${(url == basicFetchElementsUrl) ? "?": "&"}q=${searchStr}`
+        }
         setUrl(url);
         if (offset) setCurrentOffset(currentOffset+6);
     }
@@ -33,7 +40,7 @@ const Catalog = (props: CatalogProps) => {
     useEffect(() => {
         fetchElements(selectedCategory);
         setCurrentOffset(0);
-    },[selectedCategory]);
+    },[selectedCategory,searchStr]);
 
     return (
         <Container>
@@ -43,7 +50,7 @@ const Catalog = (props: CatalogProps) => {
                 <section className="catalog">
                     <h2 className="text-center">Каталог</h2>
                     <form className="catalog-search-form form-inline">
-                        <input className="form-control" placeholder="Поиск"></input>
+                        <input className="form-control" placeholder="Поиск" value={searchStr}></input>
                     </form>
                     {!!categories ?
                     <Nav className="catalog-categories justify-content-center" as="ul">

@@ -2,7 +2,7 @@ import { Button, Form, Table, Spinner} from "react-bootstrap"
 import {CartContext, CartContextElementType} from '../contexts/CartContext';
 import {useContext, useState} from 'react';
 import axios from "axios";
-
+import useInput from "../hooks/useInput";
 
 const OrderForm = () => {
     const {order, setOrder} = useContext(CartContext);
@@ -11,18 +11,19 @@ const OrderForm = () => {
       return {id: item.id,price: item.price, count: item.quantity}
     }
     
-    const [address,setAddress] = useState<string>();
-    const [phone,setPhone] = useState<string>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>();
     const [success, setSuccess] = useState<boolean>();
+    
+    const phoneInput = useInput();
+    const addressInput = useInput();
 
     const handleSubmit = () => {
       setIsLoading(true);
       axios.post('http://localhost:7070/api/order', {
         "owner": {
-          "phone": phone,
-           "address": address
+          "phone": phoneInput.value,
+           "address": addressInput.value
         },
         "items": order.map((item) => toCartItem(item))
       })
@@ -40,16 +41,6 @@ const OrderForm = () => {
       });
     }
 
-    const handlePhoneChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const {value} = event.target;
-      setPhone(value);
-    }
-
-    const handleAddressChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const {value} = event.target;
-      setAddress(value);
-    }
-
     return (
       success ?
       <h2>Заказ успешно оформлен</h2> :
@@ -65,11 +56,11 @@ const OrderForm = () => {
             }}>
               <Form.Group controlId="phone">
                 <Form.Label>Телефон</Form.Label>
-                <Form.Control type="text" placeholder="+7XXXXXXXXX" required={true} onChange={handlePhoneChanged}/>
+                <Form.Control type="text" placeholder="+7XXXXXXXXX" required={true} value={phoneInput.value} onChange={phoneInput.onChange}/>
               </Form.Group>
               <Form.Group controlId="address">
                 <Form.Label>Адрес доставки</Form.Label>
-                <Form.Control type="text" placeholder="Например: г. Москва, ул. Б. Якиманка, д. 42" required={true} onChange={handleAddressChanged}/>
+                <Form.Control type="text" placeholder="Например: г. Москва, ул. Б. Якиманка, д. 42" required={true} value={addressInput.value} onChange={addressInput.onChange}/>
               </Form.Group>
               <Form.Group controlId="agreement">
                 <Form.Check
