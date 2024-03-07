@@ -1,6 +1,6 @@
 import { Button, Form, Table, Spinner} from "react-bootstrap"
 import {CartContext, CartContextElementType} from '../contexts/CartContext';
-import {useContext, useState} from 'react';
+import {useContext, useState, useEffect} from 'react';
 import axios from "axios";
 import useInput from "../hooks/useInput";
 
@@ -88,6 +88,9 @@ const OrderForm = () => {
 
 const Cart = () => {
     const {order, setOrder} = useContext(CartContext);
+
+    useEffect(() => window.localStorage.setItem('order',JSON.stringify(order)),[order]);
+
     return (
         <>
         <section className="cart">
@@ -108,7 +111,7 @@ const Cart = () => {
                 {order?.map((elem, index) => 
                 <tr key={elem.id}>
                   <td scope="row">{index+1}</td>
-                  <td><a href={`/products/${elem.id}`}>{elem.title}</a></td>
+                  <td><a href={`/catalog/${elem.id}`}>{elem.title}</a></td>
                   <td>{elem.size}</td>
                   <td>{elem.quantity}</td>
                   <td>{elem.price}</td>

@@ -6,7 +6,7 @@ const MainPage = () => {
     return (
         <div>
             <Bestsellers/>
-            <Catalog/>
+            <Catalog showSearchField={false}/>
         </div>
     )
 }

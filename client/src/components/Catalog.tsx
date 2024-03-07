@@ -1,15 +1,17 @@
-import {Container, Row, Col, Nav, Spinner, Button} from "react-bootstrap";
+import {Container, Row, Col, Nav, Spinner, Button, Form} from "react-bootstrap";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import CatalogItemCard from './CatalogItemCard';
 import useData from "../hooks/useData";
 import { SearchContext } from '../contexts/SearchContext';
+import useInput from "../hooks/useInput";
 
 type CatalogProps = {
-    children?: React.ReactNode;
+    children?: React.ReactNode,
+    showSearchField?: boolean
 }
 
-const Catalog = (props: CatalogProps) => {
+const Catalog = ({children = [], showSearchField = true}: CatalogProps) => {
     const [categories, setCategories] = useState<{id:number,title:string}[]>();
     const [selectedCategory,setSelectedCategory] = useState<number>();
     const [currentOffset,setCurrentOffset] = useState<number>(0);
@@ -17,6 +19,7 @@ const Catalog = (props: CatalogProps) => {
     const [url, setUrl] = useState<string>(basicFetchElementsUrl);
 
     const {searchStr} = useContext(SearchContext);
+    let catalogSearchStr = useInput(searchStr);
 
     const fetchCategories = () => {
         axios.get('http://localhost:7070/api/categories')
@@ -26,8 +29,12 @@ const Catalog = (props: CatalogProps) => {
 
     const fetchElements = (selectedCategory?:number, offset: boolean = false) => {
         let url = `${basicFetchElementsUrl}${!!selectedCategory ? `?categoryId=${selectedCategory}` : ""}${offset ? `${!!selectedCategory ? "&" : "?"}offset=${currentOffset+6}` : ""}`;
-        if (!!searchStr) {
-            url = `${url}${(url == basicFetchElementsUrl) ? "?": "&"}q=${searchStr}`
+        if (!!catalogSearchStr.value) {
+            url = `${url}${(url == basicFetchElementsUrl) ? "?": "&"}q=${catalogSearchStr.value}` 
+        } else {
+            if (!!searchStr) {
+                url = `${url}${(url == basicFetchElementsUrl) ? "?": "&"}q=${searchStr}`
+            }
         }
         setUrl(url);
         if (offset) setCurrentOffset(currentOffset+6);
@@ -42,16 +49,27 @@ const Catalog = (props: CatalogProps) => {
         setCurrentOffset(0);
     },[selectedCategory,searchStr]);
 
+    
     return (
         <Container>
             <Row>
               <Col>
-                {props.children}
+                {children}
                 <section className="catalog">
                     <h2 className="text-center">Каталог</h2>
-                    <form className="catalog-search-form form-inline">
-                        <input className="form-control" placeholder="Поиск" value={searchStr}></input>
-                    </form>
+                    {showSearchField && <Form className="catalog-search-form form-inline">
+                        <Form.Control 
+                        placeholder="Поиск"  
+                        value={catalogSearchStr.value} 
+                        onChange={catalogSearchStr.onChange}
+                        onKeyDown={(e) => { 
+                            if (e.key == "Enter") {
+                                e.preventDefault();
+                                fetchElements(selectedCategory);
+                            }
+                        }
+                        }></Form.Control>
+                    </Form>}
                     {!!categories ?
                     <Nav className="catalog-categories justify-content-center" as="ul">
                         <Nav.Item as="li">
