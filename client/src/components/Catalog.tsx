@@ -18,7 +18,7 @@ const Catalog = ({children = [], showSearchField = true}: CatalogProps) => {
     const basicFetchElementsUrl = 'http://localhost:7070/api/items'
     const [url, setUrl] = useState<string>(basicFetchElementsUrl);
 
-    const {searchStr} = useContext(SearchContext);
+    const {searchStr, setSearchStr} = useContext(SearchContext);
     let catalogSearchStr = useInput(searchStr);
 
     const fetchCategories = () => {
@@ -49,7 +49,6 @@ const Catalog = ({children = [], showSearchField = true}: CatalogProps) => {
         setCurrentOffset(0);
     },[selectedCategory,searchStr]);
 
-    
     return (
         <Container>
             <Row>

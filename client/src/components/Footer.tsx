@@ -1,8 +1,6 @@
 import {Row,Col, Nav} from 'react-bootstrap';
 
 const Footer = () => {
-    //у Nav есть props - defaultActiveKey="/home"
-    // <Nav.Link eventKey="disabled" disabled>, eventKey
     return (
         <footer className="container bg-light footer">
         <Row>
