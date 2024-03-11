@@ -1,7 +1,7 @@
 import {Row} from 'react-bootstrap';
 import CatalogItemCard from './CatalogItemCard';
-import useData from "../hooks/useData";
 import {Spinner} from "react-bootstrap";
+import useData from '../hooks/useData.tsx';
 
 const Bestsellers = () => {
         const [{data,isLoading,error}] = useData('http://localhost:7070/api/top-sales');
