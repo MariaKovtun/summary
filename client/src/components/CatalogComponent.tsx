@@ -1,25 +1,23 @@
-import {Container, Row, Col, Nav, Spinner, Button, Form} from "react-bootstrap";
-import { useContext, useEffect, useState } from "react";
+import {Container, Row, Col, Nav, Button, Form, Spinner} from "react-bootstrap";
+import {useEffect, useState } from "react";
 import axios from "axios";
 import CatalogItemCard from './CatalogItemCard';
 import useData from "../hooks/useData";
-import { SearchContext } from '../contexts/SearchContext';
-import useInput from "../hooks/useInput";
+import Loader from './Loader';
+import { useLocation} from "react-router-dom";
 
 type CatalogProps = {
     children?: React.ReactNode,
     showSearchField?: boolean
 }
 
-const Catalog = ({children = [], showSearchField = true}: CatalogProps) => {
+const CatalogComponent = ({children = [], showSearchField = true}: CatalogProps) => {
     const [categories, setCategories] = useState<{id:number,title:string}[]>();
     const [selectedCategory,setSelectedCategory] = useState<number>();
     const [currentOffset,setCurrentOffset] = useState<number>(0);
-    const basicFetchElementsUrl = 'http://localhost:7070/api/items'
-    const [url, setUrl] = useState<string>(basicFetchElementsUrl);
-
-    const {searchStr, setSearchStr} = useContext(SearchContext);
-    let catalogSearchStr = useInput(searchStr);
+    
+    const {search} = useLocation();
+    const [searchStr, setSearchStr] = useState<string>(new URLSearchParams(search).get('q'));
 
     const fetchCategories = () => {
         axios.get('http://localhost:7070/api/categories')
@@ -27,27 +25,39 @@ const Catalog = ({children = [], showSearchField = true}: CatalogProps) => {
         .then(data => setCategories(data))
     }
 
-    const fetchElements = (selectedCategory?:number, offset: boolean = false) => {
-        let url = `${basicFetchElementsUrl}${!!selectedCategory ? `?categoryId=${selectedCategory}` : ""}${offset ? `${!!selectedCategory ? "&" : "?"}offset=${currentOffset+6}` : ""}`;
-        if (!!catalogSearchStr.value) {
-            url = `${url}${(url == basicFetchElementsUrl) ? "?": "&"}q=${catalogSearchStr.value}` 
-        } else {
-            if (!!searchStr) {
-                url = `${url}${(url == basicFetchElementsUrl) ? "?": "&"}q=${searchStr}`
-            }
+    const updateFetchElementsUrl = (selectedCategory?:number, offset: boolean = false) => {
+        let url = new URL(basicFetchElementsUrl);
+        
+        if (!!selectedCategory) url.searchParams.append("categoryId",selectedCategory.toString());
+        if (offset) url.searchParams.append("offset",(currentOffset+6).toString());
+        
+        if (!!searchStr) {
+            url.searchParams.append("q",searchStr);
         }
-        setUrl(url);
+        setFetchElementsUrl(decodeURI(url.toString()));
+        
         if (offset) setCurrentOffset(currentOffset+6);
     }
-
-    const [{data,isLoading,error}] = useData(url);
+    const basicFetchElementsUrl = 'http://localhost:7070/api/items';
+    const [fetchElementsUrl, setFetchElementsUrl] = useState<string>(basicFetchElementsUrl);
 
     useEffect(fetchCategories,[]);
-    
+
     useEffect(() => {
-        fetchElements(selectedCategory);
+        console.log("произошло изменение параметра search");
+        const q = new URLSearchParams(search).get('q');
+        if (!!q) {
+            setSearchStr(q);
+            updateFetchElementsUrl();
+        }
+    },[search]);
+
+    useEffect(() => {
+        updateFetchElementsUrl(selectedCategory);
         setCurrentOffset(0);
-    },[selectedCategory,searchStr]);
+    },[selectedCategory]);
+
+    const [{data,isLoading,error}] = useData(fetchElementsUrl);
 
     return (
         <Container>
@@ -58,13 +68,14 @@ const Catalog = ({children = [], showSearchField = true}: CatalogProps) => {
                     <h2 className="text-center">Каталог</h2>
                     {showSearchField && <Form className="catalog-search-form form-inline">
                         <Form.Control 
-                        placeholder="Поиск"  
-                        value={catalogSearchStr.value} 
-                        onChange={catalogSearchStr.onChange}
+                        placeholder="Поиск" 
+                        defaultValue={searchStr}
+                        value={searchStr} 
+                        onChange={(e) => setSearchStr(e.target.value)}
                         onKeyDown={(e) => { 
                             if (e.key == "Enter") {
                                 e.preventDefault();
-                                fetchElements(selectedCategory);
+                                updateFetchElementsUrl(selectedCategory);
                             }
                         }
                         }></Form.Control>
@@ -81,16 +92,7 @@ const Catalog = ({children = [], showSearchField = true}: CatalogProps) => {
                     </Nav> :  null}
                     {isLoading ? 
                     (currentOffset == 0) ?
-                    <div className="d-flex justify-content-center">
-                        <Spinner animation="border" variant="primary" />
-                        <Spinner animation="border" variant="secondary" />
-                        <Spinner animation="border" variant="success" />
-                        <Spinner animation="border" variant="danger" />
-                        <Spinner animation="border" variant="warning" />
-                        <Spinner animation="border" variant="info" />
-                        <Spinner animation="border" variant="light" />
-                        <Spinner animation="border" variant="dark" />
-                    </div> :
+                    <Loader/> :
                     <Button variant="outline-primary" disabled>
                         <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/>
                         Загрузка
@@ -105,7 +107,7 @@ const Catalog = ({children = [], showSearchField = true}: CatalogProps) => {
                     </Row>
                     {!!data && (data.length >= 6) ? 
                     <div className="text-center">
-                        <Button variant="outline-primary" onClick={() => fetchElements(selectedCategory,true)}>Загрузить ещё</Button>
+                        <Button variant="outline-primary" onClick={() => updateFetchElementsUrl(selectedCategory,true)}>Загрузить ещё</Button>
                     </div> : null}
                     </>
                     }
@@ -116,4 +118,4 @@ const Catalog = ({children = [], showSearchField = true}: CatalogProps) => {
     )
 }
 
-export default Catalog;
+export default CatalogComponent;

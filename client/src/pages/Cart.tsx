@@ -3,6 +3,8 @@ import {CartContext, CartContextElementType} from '../contexts/CartContext';
 import {useContext, useState, useEffect} from 'react';
 import axios from "axios";
 import useInput from "../hooks/useInput";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 
 const OrderForm = () => {
     const {order, setOrder} = useContext(CartContext);
@@ -93,6 +95,7 @@ const Cart = () => {
 
     return (
         <>
+        <Header/>
         <section className="cart">
             <h2 className="text-center">Корзина</h2>
             <Table bordered={true}>
@@ -132,6 +135,7 @@ const Cart = () => {
             </Table>
             <OrderForm/>
           </section>
+          <Footer/>
         </>
     )   
 }

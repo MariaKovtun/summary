@@ -32,6 +32,9 @@ section {
 
 /* Header */
 .header-controls-pics {
+  position: absolute;
+  right: 8px;
+  top: calc(50% - 19px);
   display: flex;
   justify-content: space-between;
   max-width: 280px;
@@ -175,6 +178,15 @@ section {
 .catalog-categories {
   font-size: 1.3rem;
   margin-bottom: 2em;
+}
+
+.flex-cards {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flex-cards .card {
+  flex: 1;
 }
 
 .catalog-item-card {

@@ -1,9 +1,12 @@
-import Banner from "./Banner";
+import Banner from "../components/Banner";
 import {Container, Row,Col} from 'react-bootstrap';
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 
 const Contacts = () => {
     return (
     <>
+    <Header/>
     <Container>
         <Row>
           <Col>
@@ -18,6 +21,7 @@ const Contacts = () => {
           </Col>
         </Row>
     </Container>
+    <Footer/>
     </>
     )
 }

@@ -4,11 +4,11 @@ import {useState, useContext} from 'react';
 import {CartContext} from '../contexts/CartContext';
 import useInput from '../hooks/useInput';
 import { useNavigate } from 'react-router';
-import { SearchContext } from '../contexts/SearchContext';
+import { NavLink } from "react-router-dom";
 
 const HeaderControlPics = () => {
     const {order} = useContext(CartContext);
-    const {searchStr, setSearchStr} = useContext(SearchContext);
+    //const {searchStr, setSearchStr} = useContext(SearchContext);
     
     const [searchFieldVisible,setSearchFieldVisible] = useState<boolean>(false);
     
@@ -19,8 +19,7 @@ const HeaderControlPics = () => {
     let formClassName = `header-controls-search-form form-inline ${searchFieldVisible ? "" : "invisible"}`;
 
     const onSearchStrChanged = (newStr: string) => {
-        setSearchStr(searchInput.value);
-        route("/catalog");
+        route(`/catalog?q=${newStr}`);
     }
 
     return (
@@ -52,13 +51,17 @@ const Header = () => {
         <Col>
             <Navbar expand="sm" className="bg-light">
             <Container>
-                <Navbar.Brand href="/"><img src={logo} alt="Bosa Noga"></img></Navbar.Brand>
+                <Navbar.Brand>
+                    <Nav.Link as={NavLink} to="/">
+                        <img src={logo} alt="Bosa Noga"></img>
+                    </Nav.Link>
+                </Navbar.Brand>
                 <Navbar.Collapse id="navbarMain">
                 <Nav className="mr-auto">
-                    <Nav.Link href="/">Главная</Nav.Link>
-                    <Nav.Link href="/catalog">Каталог</Nav.Link>
-                    <Nav.Link href="/about">О магазине</Nav.Link>
-                    <Nav.Link href="/contacts">Контакты</Nav.Link>
+                    <Nav.Link as={NavLink} to="/">Главная</Nav.Link>
+                    <Nav.Link as={NavLink} to="/catalog">Каталог</Nav.Link>
+                    <Nav.Link as={NavLink} to="/about">О магазине</Nav.Link>
+                    <Nav.Link as={NavLink} to="/contacts">Контакты</Nav.Link>
                     <HeaderControlPics/>
                     </Nav>
                 </Navbar.Collapse>

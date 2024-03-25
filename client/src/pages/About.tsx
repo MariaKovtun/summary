@@ -1,9 +1,12 @@
-import Banner from "./Banner";
+import Banner from "../components/Banner";
 import {Container, Row,Col, ListGroup} from 'react-bootstrap';
+import Footer from "../components/Footer";
+import Header from "../components/Header";
 
 const About = () => {
     return (
-        <body>
+        <>
+        <Header/>
         <Container>
             <Row>
                 <Col>
@@ -42,7 +45,8 @@ const About = () => {
               </Col>
             </Row>
         </Container>
-  </body>
+        <Footer/>
+        </>
     )
 }
 

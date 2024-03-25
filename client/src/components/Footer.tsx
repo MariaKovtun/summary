@@ -1,4 +1,5 @@
 import {Row,Col, Nav} from 'react-bootstrap';
+import { NavLink } from "react-router-dom";
 
 const Footer = () => {
     return (
@@ -8,9 +9,9 @@ const Footer = () => {
             <section>
               <h5>Информация</h5>
               <Nav className="flex-column">
-                  <Nav.Link eventKey="link-1" href="/about">О магазине</Nav.Link>
-                  <Nav.Link eventKey="link-2" href="/catalog">Каталог</Nav.Link>
-                  <Nav.Link eventKey="link-3" href="/contacts">Контакты</Nav.Link>   
+                  <Nav.Link as={NavLink} to="/about">О магазине</Nav.Link>
+                  <Nav.Link as={NavLink} to="/catalog">Каталог</Nav.Link>
+                  <Nav.Link as={NavLink} to="/contacts">Контакты</Nav.Link>   
                   </Nav>
             </section>
           </Col>

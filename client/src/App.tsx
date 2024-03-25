@@ -1,16 +1,18 @@
 import './App.css'
-import Contacts from './components/Contacts'
-import NotFound from './components/NotFound'
+import Contacts from './pages/Contacts'
+import NotFound from './pages/NotFound'
 import BasicComponent from './components/BasicComponent'
-import About from './components/About'
-import Catalog from './components/Catalog'
-import MainPage from './components/MainPage'
+import About from './pages/About'
+import Catalog from './pages/Catalog'
+import MainPage from './pages/MainPage'
 import Banner from './components/Banner'
 import CatalogItemCardFull from './components/CatalogItemCardFull'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Cart from './components/Cart'
+import Cart from './pages/Cart'
 import { useState } from 'react'
 import {CartContext, CartContextElementType} from './contexts/CartContext';
+import Header from './components/Header'
+import Footer from './components/Footer'
 
 function App() {
   const currentStorage = window.localStorage.getItem('order');
@@ -21,17 +23,18 @@ function App() {
 
   return (
     <CartContext.Provider value={{order,setOrder}}>
-    <BrowserRouter>
+      <BrowserRouter>
       <Routes>
-        <Route path="*" element={<BasicComponent><NotFound/></BasicComponent>} />
-        <Route path="/" element={<BasicComponent><MainPage/></BasicComponent>}/>
-        <Route path="/contacts" element={<BasicComponent><Contacts/></BasicComponent>}/>
-        <Route path="/about" element={<BasicComponent><About/></BasicComponent>}/>
-        <Route path="/catalog" element={<BasicComponent><Catalog><Banner/></Catalog></BasicComponent>}/>
-        <Route path="/catalog/:id" element={<BasicComponent><CatalogItemCardFull/></BasicComponent>}/>
-        <Route path="/cart" element={<BasicComponent><Cart/></BasicComponent>}/>
+        <Route path="*" element={<NotFound/>} />
+        <Route path="/" element={<MainPage/>}/>
+        <Route path="/contacts" element={<Contacts/>}/>
+        <Route path="/about" element={<About/>}/>
+        <Route path="/catalog" element={<Catalog><Banner/></Catalog>}/>
+        <Route path="/catalog/:id" element={<CatalogItemCardFull/>}/>
+        <Route path="/cart" element={<Cart/>}/>
       </Routes>
     </BrowserRouter>
+    
    </CartContext.Provider>
   )
 }

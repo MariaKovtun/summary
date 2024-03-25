@@ -4,7 +4,7 @@ const CatalogItemCard = ({id,title,images,price}: CatalogItemProps) => {
     let link = `/catalog/${id}`;
 
     return (
-        <div className="col-4">
+        <div className="col-4 flex-cards">
             <div className="card catalog-item-card">
                 <img src={images[0]} className="card-img-top img-fluid" alt={title}></img>
                 <div className="card-body">

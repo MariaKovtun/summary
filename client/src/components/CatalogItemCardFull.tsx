@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { useEffect, useState, useContext} from 'react';
 import {useParams} from 'react-router-dom';
-import {Row, Spinner, Table} from "react-bootstrap";
+import {Row, Table} from "react-bootstrap";
 import {CartContext} from '../contexts/CartContext';
 import { useNavigate } from 'react-router';
+import Loader from './Loader';
 
 type CatalogItemCardFullProps = {
         "id":number,
@@ -67,16 +68,7 @@ const CatalogItemCardFull = () => {
     const route = useNavigate();
 
    return (
-       isLoading ? <>
-        <Spinner animation="grow" variant="primary" />
-        <Spinner animation="grow" variant="secondary" />
-        <Spinner animation="grow" variant="success" />
-        <Spinner animation="grow" variant="danger" />
-        <Spinner animation="grow" variant="warning" />
-        <Spinner animation="grow" variant="info" />
-        <Spinner animation="grow" variant="light" />
-        <Spinner animation="grow" variant="dark" />
-       </> :
+       isLoading ? <Loader/> :
        error ? <p>Произошла ошибка при загрузке элемента. Обновите страницу и повторите попытку</p> :
        <section className="catalog-item">
            <h2 className="text-center">{item?.title}</h2>
