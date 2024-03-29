@@ -1,18 +1,15 @@
 import './App.css'
 import Contacts from './pages/Contacts'
 import NotFound from './pages/NotFound'
-import BasicComponent from './components/BasicComponent'
 import About from './pages/About'
 import Catalog from './pages/Catalog'
 import MainPage from './pages/MainPage'
-import Banner from './components/Banner'
 import CatalogItemCardFull from './components/CatalogItemCardFull'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Cart from './pages/Cart'
 import { useState } from 'react'
 import {CartContext, CartContextElementType} from './contexts/CartContext';
-import Header from './components/Header'
-import Footer from './components/Footer'
+
 
 function App() {
   const currentStorage = window.localStorage.getItem('order');
@@ -29,7 +26,7 @@ function App() {
         <Route path="/" element={<MainPage/>}/>
         <Route path="/contacts" element={<Contacts/>}/>
         <Route path="/about" element={<About/>}/>
-        <Route path="/catalog" element={<Catalog><Banner/></Catalog>}/>
+        <Route path="/catalog" element={<Catalog/>}/>
         <Route path="/catalog/:id" element={<CatalogItemCardFull/>}/>
         <Route path="/cart" element={<Cart/>}/>
       </Routes>
