@@ -15,7 +15,7 @@ const CatalogComponent = ({
   showSearchField = true,
 }: CatalogProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const {pathname} = useLocation();
+  
   const q = searchParams.get("q");
   const selectedCategory = searchParams.get("categoryId");
   const offset = searchParams.get("offset");
@@ -85,14 +85,20 @@ const CatalogComponent = ({
               </Form>
             )}
             <Nav className="catalog-categories justify-content-center">
-              <Nav.Link>
+              <Nav.Link 
+              onClick={(e) => {
+                e.preventDefault();
+                searchParams.delete("offset");
+                searchParams.delete("categoryId");
+                setSearchParams(searchParams);
+              }}
+              className={(selectedCategory == null) ? "active" : ""}>
                 Все
               </Nav.Link>
               {categories?.map((category) => (
                 <Nav.Link
                   onClick={(e) => {
                     e.preventDefault();
-                    e.target.focus();
                     searchParams.delete("offset");
                     searchParams.set("categoryId", category.id.toString());
                     setSearchParams(searchParams);

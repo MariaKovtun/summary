@@ -299,7 +299,7 @@ section {
 }
 
 /* Bootstrap */
-.nav-link.active {
+.nav-link.active, .nav-link.active:hover,.nav-link.active:focus {
   color: #ff0000;
 }
 
