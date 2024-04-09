@@ -4,16 +4,16 @@ import Header from "../components/Header";
 import Catalog from "../components/CatalogComponent";
 
 const MainPage = () => {
-    return (
-        <>
-        <Header/>
-        <div>
-            <Bestsellers/>
-            <Catalog showSearchField={false}/>
-        </div>
-        <Footer/>
-        </>
-    )
-}
+  return (
+    <>
+      <Header />
+      <div>
+        <Bestsellers />
+        <Catalog showSearchField={false} />
+      </div>
+      <Footer />
+    </>
+  );
+};
 
 export default MainPage;

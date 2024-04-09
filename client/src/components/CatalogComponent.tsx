@@ -1,75 +1,125 @@
-import {Container, Row, Col, Nav, Button, Form, Spinner} from "react-bootstrap";
-import {useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate} from "react-router-dom";
-import {debounce} from 'lodash';
+import { Container, Row, Col, Nav, Form } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { NavLink, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { CatalogItemProps } from "./CatalogItemsProps";
-import CatalogItemCard from "./CatalogItemCard";
+import CatalogItemProps from "./CatalogItemProps";
+import CatalogItems from "./CatalogItems";
 
 type CatalogProps = {
-    children?: React.ReactNode,
-    showSearchField?: boolean
-}
+  children?: React.ReactNode;
+  showSearchField?: boolean;
+};
 
-const CatalogComponent = ({children = [], showSearchField = true}: CatalogProps) => {
-    const {search} = useLocation();
-    const q = new URLSearchParams(search).get('q');
+const CatalogComponent = ({
+  children = [],
+  showSearchField = true,
+}: CatalogProps) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const q = searchParams.get("q");
+  const selectedCategory = searchParams.get("categoryId");
+  const offset = searchParams.get("offset");
 
-    const basicFetchElementsUrl = 'http://localhost:7070/api/items'
-    const [data,setData] = useState<CatalogItemProps[]>();
-    
+  const basicFetchElementsUrl = "http://localhost:7070/api/items";
+  const [items, setItems] = useState<CatalogItemProps[]>();
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState<string>();
+  const [loadMoreBtnHidden, setLoadMoreBtnHidden] = useState<boolean>(true);
 
-    const fetchData = () => {
-        let url = new URL(basicFetchElementsUrl);
-        if (!!q) url.searchParams.append("q",q);
-        //if (!!selectedCategory) url.searchParams.append("categoryId",selectedCategory.toString());
-        //if (offset) url.searchParams.append("offset",(currentOffset+6).toString());
-        
-        axios.get(decodeURI(url.toString()))
-        .then(res => res.data)
-        .then(data => setData(data))
-    }
+  const fetchData = () => {
+    let url = new URL(basicFetchElementsUrl);
+    if (q) url.searchParams.append("q", q);
+    if (selectedCategory)
+      url.searchParams.append("categoryId", selectedCategory.toString());
+    if (offset) url.searchParams.append("offset", offset);
 
-    useEffect(fetchData,[q]);
-    
-    const route = useNavigate();
-    const handleDebounceFn = (value: string) => {
-        route(`/catalog?q=${value}`)
-    }
-    const debounceFn = useCallback(debounce(handleDebounceFn, 500), []);
+    setLoading(true);
+    axios
+      .get(decodeURI(url.toString()))
+      .then((res) => res.data)
+      .then((data) => {
+        offset ? setItems(items?.concat(data)) : setItems(data);
+        setLoading(false);
+        setLoadMoreBtnHidden(data.length < 6);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setError(error);
+      });
+  };
 
-    return (
-        <Container>
-            <Row>
-              <Col>
-                {children}
-                <section className="catalog">
-                    <h2 className="text-center">Каталог</h2>
-                    {showSearchField && 
-                    <Form className="catalog-search-form form-inline">
-                        <Form.Control 
-                        placeholder="Поиск" 
-                        defaultValue={q}
-                        onChange={(e) => debounceFn(e.target.value)}
-                        onKeyDown={(e) => { 
-                            if (e.key == "Enter") {
-                                e.preventDefault();
-                                debounceFn(e.target.value);
-                            }
-                        }
-                        }></Form.Control>
-                    </Form>}
-                    <Row>
-                    {(data?.length > 0) ? 
-                        data?.map((item) => <CatalogItemCard key={item.id} {...item}></CatalogItemCard>) : null
+  useEffect(fetchData, [q, selectedCategory, offset]);
+
+  const [categories, setCategories] =
+    useState<{ id: number; title: string }[]>();
+
+  const fetchCategories = () => {
+    axios
+      .get("http://localhost:7070/api/categories")
+      .then((res) => res.data)
+      .then((data) => setCategories(data));
+  };
+
+  useEffect(fetchCategories, []);
+
+  return (
+    <Container>
+      <Row>
+        <Col>
+          {children}
+          <section className="catalog">
+            <h2 className="text-center">Каталог</h2>
+            {showSearchField && (
+              <Form className="catalog-search-form form-inline">
+                <Form.Control
+                  placeholder="Поиск"
+                  defaultValue={q || ""}
+                  onKeyDown={(e) => {
+                    if (e.key == "Enter") {
+                      e.preventDefault();
+                      searchParams.set("q", e.target.value);
+                      setSearchParams(searchParams);
                     }
-                    </Row>
-                    
-                </section>
-              </Col>
-            </Row>
-        </Container>
-    )
-}
+                  }}
+                ></Form.Control>
+              </Form>
+            )}
+            <Nav className="catalog-categories justify-content-center">
+              <Nav.Link as={NavLink} to="/catalog">
+                Все
+              </Nav.Link>
+              {categories?.map((category) => (
+                <Nav.Link
+                  as={NavLink}
+                  to="/"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    searchParams.delete("offset");
+                    searchParams.set("categoryId", category.id.toString());
+                    setSearchParams(searchParams);
+                  }}
+                >
+                  {category.title}
+                </Nav.Link>
+              ))}
+            </Nav>
+            <CatalogItems
+              items={items}
+              isLoading={isLoading}
+              error={error}
+              loadMoreBtnHidden={loadMoreBtnHidden}
+              handleClick={() => {
+                searchParams.set(
+                  "offset",
+                  offset ? (+offset + 6).toString() : "6"
+                );
+                setSearchParams(searchParams);
+              }}
+            />
+          </section>
+        </Col>
+      </Row>
+    </Container>
+  );
+};
 
 export default CatalogComponent;

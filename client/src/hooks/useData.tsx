@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react"
-import { CatalogItemProps } from "../components/CatalogItemsProps";
+import CatalogItemProps from "../components/CatalogItemProps";
 import axios from "axios";
 
 export default function useData(url: string) {
