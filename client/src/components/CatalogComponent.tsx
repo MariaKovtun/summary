@@ -1,6 +1,6 @@
 import { Container, Row, Col, Nav, Form } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { NavLink, useSearchParams } from "react-router-dom";
+import { Link,NavLink, useSearchParams, useLocation} from "react-router-dom";
 import axios from "axios";
 import CatalogItemProps from "./CatalogItemProps";
 import CatalogItems from "./CatalogItems";
@@ -15,6 +15,7 @@ const CatalogComponent = ({
   showSearchField = true,
 }: CatalogProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const {pathname} = useLocation();
   const q = searchParams.get("q");
   const selectedCategory = searchParams.get("categoryId");
   const offset = searchParams.get("offset");
@@ -84,19 +85,19 @@ const CatalogComponent = ({
               </Form>
             )}
             <Nav className="catalog-categories justify-content-center">
-              <Nav.Link as={NavLink} to="/catalog">
+              <Nav.Link>
                 Все
               </Nav.Link>
               {categories?.map((category) => (
                 <Nav.Link
-                  as={NavLink}
-                  to="/"
                   onClick={(e) => {
                     e.preventDefault();
+                    e.target.focus();
                     searchParams.delete("offset");
                     searchParams.set("categoryId", category.id.toString());
                     setSearchParams(searchParams);
                   }}
+                  className={(selectedCategory == category.id.toString()) ? "active" : ""}
                 >
                   {category.title}
                 </Nav.Link>
