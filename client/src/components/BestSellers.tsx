@@ -5,7 +5,7 @@ import Loader from "./Loader";
 
 const Bestsellers = () => {
   const [{ data, isLoading, error }] = useData(
-    "http://localhost:7070/api/top-sales"
+    "http://localhost:3000/api/top-sales"
   );
 
   if (isLoading) return <Loader />;

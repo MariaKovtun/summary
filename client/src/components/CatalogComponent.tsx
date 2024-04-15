@@ -20,7 +20,7 @@ const CatalogComponent = ({
   const selectedCategory = searchParams.get("categoryId");
   const offset = searchParams.get("offset");
 
-  const basicFetchElementsUrl = "http://localhost:7070/api/items";
+  const basicFetchElementsUrl = "http://localhost:3000/api/items";
   const [items, setItems] = useState<CatalogItemProps[]>();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
@@ -55,7 +55,7 @@ const CatalogComponent = ({
 
   const fetchCategories = () => {
     axios
-      .get("http://localhost:7070/api/categories")
+      .get("http://localhost:3000/api/categories")
       .then((res) => res.data)
       .then((data) => setCategories(data));
   };

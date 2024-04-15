@@ -114,6 +114,6 @@ router.post('/api/order', async (ctx, next) => {
 app.use(router.routes())
 app.use(router.allowedMethods());
 
-const port = process.env.PORT || 7070;
+const port = 3000;
 const server = http.createServer(app.callback());
 server.listen(port, () => console.log(`The server is running on http://localhost:${port}`));

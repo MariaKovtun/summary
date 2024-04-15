@@ -21,7 +21,7 @@ const OrderForm = () => {
   const handleSubmit = () => {
     setIsLoading(true);
     axios
-      .post("http://localhost:7070/api/order", {
+      .post("http://localhost:3000/api/order", {
         owner: {
           phone: phoneInput.value,
           address: addressInput.value,

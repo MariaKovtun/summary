@@ -33,5 +33,5 @@
     "typescript": "^5.2.2",
     "vite": "^5.1.4"
   },
-  "proxy": "http://localhost:7070"
+  "proxy": "http://localhost:3000"
 }

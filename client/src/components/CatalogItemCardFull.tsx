@@ -37,7 +37,7 @@ const CatalogItemCardFull = () => {
   const fetchItem = (id?: string) => {
     setIsLoading(true);
     axios
-      .get("http://localhost:7070/api/items/${id}")
+      .get(`http://localhost:3000/api/items/${id}`)
       .then((res) => res.data)
       .then((data) => {
         setItem(data);
